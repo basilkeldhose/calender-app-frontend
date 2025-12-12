@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
-
+import { ToastrService } from 'ngx-toastr'
 @Component({
   selector: 'app-event-dialog',
   standalone: true,
@@ -53,9 +53,9 @@ export class EventDialogComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any,
     private fb: FormBuilder,
     private es: EventService,
-    public dialogRef: MatDialogRef<EventDialogComponent>
+    public dialogRef: MatDialogRef<EventDialogComponent>,
+    private toastr: ToastrService
   ) {
-    // ensure dateIso is a yyyy-MM-dd string
     this.dateIso = (data.date instanceof Date) ? data.date.toISOString().slice(0,10) : data.date;
     if (data.event) this.editing = data.event;
   }
@@ -76,7 +76,7 @@ export class EventDialogComponent implements OnInit {
       now.setMinutes(now.getMinutes() + 15);
       const hh = now.getHours().toString().padStart(2,'0');
       const mm = now.getMinutes().toString().padStart(2,'0');
-      this.form.patchValue({ startTime: `${hh}:${mm}` });
+      this.form.patchValue({ startTime: `${hh}:${mm}`, endTime: `${(now.getHours() + 1).toString().padStart(2,'0')}:${mm}` });
     }
   }
 
@@ -125,19 +125,24 @@ export class EventDialogComponent implements OnInit {
     return false;
   }
 
-  private clearPastError() {
-    this.pastDateError = false;
-    this.pastDateMessage = '';
-  }
-
-  // ---- save / delete ----
+  // ---- save and delete ----
   save() {
-    // guard: form validity
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
-
+    if(!this.form.value.startTime || !this.form.value.endTime){
+      this.toastr.error('Start time and end time are required.', 'Invalid Time Range');
+      return;
+    }
+    if(this.form.value.startTime === this.form.value.endTime){
+      this.toastr.error('Start time and end time cannot be the same.', 'Invalid Time Range');
+      return;
+    }
+    if(this.form.value.startTime > this.form.value.endTime){
+      this.toastr.error('Start time cannot be later than end time.', 'Invalid Time Range');
+      return;
+    }
     // check past event
     const past = this.isPastEvent();
     if (past) {

@@ -29,7 +29,7 @@ export class EventService {
   listAll(): CalendarEvent[] {
     return [...this.eventsSubject.value];
   }
-
+  
   getByDate(date: string): CalendarEvent[] {
     return this.eventsSubject.value.filter(e => e.date === date);
   }
