@@ -1,0 +1,166 @@
+<div class="calendar-container">
+    <div class="calender-header">
+        <h2 class="my-event-title">MY EVENT BOARD</h2>
+    </div>
+    <div class="calendar-wrapper">
+        <!-- ==========================
+       LEFT SIDEBAR
+  =========================== -->
+        <aside class="wc-sidebar">
+            <div class="mini-month">
+                <div class="mm-top sub-title">
+                    <div class="mm-month">{{ current | date: 'MMMM yyyy' }}</div>
+                </div>
+
+                <!-- Mini Month Grid -->
+                <div class="mm-grid">
+                    <div *ngFor="let week of weeks">
+                        <div class="mm-row">
+                            <div class="mm-cell" *ngFor="let day of week" [class.active]="day.iso === selectedIso"
+                                [class.today]="isToday(day.iso)" [ngClass]="{
+                                'out-month': !day.inMonth,
+                                'past-day': isPastDate(day.iso)
+                            }">
+                                {{ day.date.getDate() }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cal-list">
+                <h4 class="sub-title">My calendars</h4>
+                <div class="cal-item"><span class="dot" style="background:#8ec5ff"></span> Work</div>
+                <div class="cal-item"><span class="dot" style="background:#f7a8ff"></span> Meetings</div>
+                <div class="cal-item"><span class="dot" style="background:#ffd27a"></span> Personal</div>
+                <div class="cal-item"><span class="dot" style="background:#c8b6ff"></span> Other</div>
+            </div>
+        </aside>
+
+        <!-- ==========================
+       MAIN CENTER WRAPPER
+  =========================== -->
+        <main class="wc-center">
+
+            <!-- TOP BAR -->
+            <div class="wc-topbar">
+                <div class="left-controls">
+                    <button mat-icon-button (click)="prev()"><mat-icon>chevron_left</mat-icon></button>
+                    <div class="title">
+                        <h2 style="line-height: 0px;margin-bottom: 0px;" *ngIf="viewMode === 'month'">{{ current | date:
+                            'MMMM yyyy' }}</h2>
+                        <h2 style="line-height: 0px;margin-bottom: 0px;" *ngIf="viewMode === 'week'">
+                            {{ weekDays[0] | date:'MMM d' }} - {{ weekDays[6] | date:'MMM d, yyyy' }}
+                        </h2>
+                    </div>
+                    <button mat-icon-button (click)="next()"><mat-icon>chevron_right</mat-icon></button>
+                </div>
+                <div class="view-switch">
+                    <button mat-stroked-button (click)="toggleView('month')"
+                        [disabled]="viewMode==='month'">Month</button>
+                    <button mat-stroked-button (click)="toggleView('week')" [disabled]="viewMode==='week'">Week</button>
+                </div>
+            </div>
+<!-- ====================================
+        MONTH VIEW GRID
+===================================== -->
+
+            <div class="month-view" *ngIf="viewMode === 'month'">
+                <div class="days-row">
+                    <div class="day-name" *ngFor="let dn of ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']">
+                        {{ dn }}
+                    </div>
+                </div>
+
+                <div class="weeks">
+                    <div class="week" *ngFor="let week of weeks">
+                        <div class="day-cell" *ngFor="let day of week" [class.out-month]="!day.inMonth"
+                            [class.today]="isToday(day.iso)" [ngClass]="{
+                            'out-month': !day.inMonth,
+                            'past-day': isPastDate(day.iso)
+                        }" [class.selected]="day.iso === selectedIso"
+                            (click)="!isPastDate(day.iso) && openDialogForDate(day)">
+
+                            <div class="date-number">{{ day.date.getDate() }}</div>
+
+                            <div class="events">
+                                <div class="event-pill" *ngFor="let e of (eventsByDate[day.iso] || [])"
+                                    [style.background]="e.color"
+                                    (click)="$event.stopPropagation(); openDialogForDate(day, e)">
+                                    {{ e.title }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ====================================
+         WEEK VIEW GRID
+    ===================================== -->
+            <div class="week-view" *ngIf="viewMode === 'week'">
+
+                <div class="wc-grid">
+
+                    <!-- Hours Column -->
+                    <div class="wc-hours">
+                        <div class="hour" *ngFor="let h of hours">{{h}}</div>
+                    </div>
+
+                    <!-- Days Columns -->
+                    <div class="wc-days">
+
+                        <div class="wc-day" *ngFor="let d of weekDays">
+
+                            <!-- Day Header -->
+                            <div class="day-header" [class.today]="isToday(toIsoDate(d))">
+                                {{ d | date:'EEE d' }}
+                            </div>
+
+                            <!-- Day Body / Time Slots -->
+                            <div class="day-body" (dblclick)="openDialogForWeekDate(d)">
+                                <div class="grid-row" *ngFor="let h of hours"></div>
+
+                                <div class="events-layer">
+                                    <div class="event-block" *ngFor="let ev of eventsForDate(d)" [ngStyle]="{
+                    top: topPercent(ev.startTime || '00:00') + '%',
+                    height: heightPercent(ev.startTime || '00:00', ev.endTime || '00:00') + '%',
+                    background: ev.color
+                    }" (click)="openDialogForWeekDate(d, ev)">
+                                        <div class="ev-title">{{ ev.title }}</div>
+                                        <div class="ev-meta">{{ ev.startTime }} - {{ ev.endTime }}</div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </main>
+
+        <!-- ==========================
+       RIGHT UPCOMING PREVIEW
+  =========================== -->
+        <aside class="wc-preview">
+            <div class="preview-head sub-title">Upcoming Events</div>
+            <div class="preview-list">
+
+                <div class="pv-item" *ngFor="let ev of upcoming_events">
+                    <div class="pv-color" [style.background]="ev.color"></div>
+                    <div class="pv-meta">
+                        <div class="pv-title">{{ ev.title }}</div>
+                        <div class="pv-time">{{ ev.date }} • {{ ev.startTime }}</div>
+                    </div>
+                </div>
+
+            </div>
+        </aside>
+    </div>
+
+
+</div>

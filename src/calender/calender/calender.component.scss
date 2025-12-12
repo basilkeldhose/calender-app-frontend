@@ -1,0 +1,560 @@
+/* -------- Variables & base -------- */
+:root {
+    --bg: #fafafa;
+    --card-bg: #fff;
+    --muted: #64748b;
+    --accent: #3b82f6;
+    --radius-lg: 16px;
+    --radius-md: 10px;
+    --shadow-1: 0 8px 30px rgba(13, 20, 30, 0.06);
+    --gap: 16px;
+}
+
+.calendar-container{
+    max-width: 1400px;
+    margin: 18px auto;
+    padding: 10px;
+    border-radius: 20px;
+    background-color: #FFFFFF;
+}
+
+.calender-header{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+.my-event-title{
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+.sub-title{
+    font-size: 1.5rem;
+    color: #1e293b;
+    font-weight: 600;
+    text-align: left;
+}
+/* ---------- Layout grid ---------- */
+.calendar-wrapper {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: row;
+    gap:20px;
+    align-items: start;
+    justify-content: center;
+}
+
+
+/* ---------- LEFT SIDEBAR ---------- */
+.wc-sidebar {
+    background: #F7F8FA;
+    padding: 14px;
+    box-shadow: var(--shadow-1);
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+    min-height: 120px;
+    max-width: 15%;
+    transition: transform .25s ease, opacity .25s ease;
+}
+
+/* Mini-month grid */
+.mm-grid {
+    display: block;
+    margin-top: 10px;
+}
+
+.mm-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 6px;
+}
+
+.mm-cell {
+    height: clamp(30px, 3.6vw, 36px);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: #0f172a;
+    background: linear-gradient(180deg, #fbfbff, #fff);
+}
+
+.mm-cell.active {
+    background: linear-gradient(180deg, #e6f0ff, #d8e8ff);
+    box-shadow: 0 6px 18px rgba(59, 130, 246, 0.06);
+    border: 1px solid #cfe0ff;
+}
+
+.mm-cell.today {
+    border: 2px solid var(--accent);
+    background: #eff6ff;
+}
+
+/* calendar list */
+.cal-list {
+    margin-top: 6px;
+}
+
+.cal-item {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.cal-item:hover {
+    background: #f4f6ff;
+}
+
+.dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+}
+/* ---------- Disable past days ---------- */
+.past-day {
+  opacity: 0.45;
+  cursor: not-allowed !important;
+  background: #f5f5f5 !important;
+  pointer-events: auto; /* allow hovering but not clicking */
+}
+
+.past-day:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+
+/* ---------- CENTER (TOP + CONTENT) ---------- */
+.wc-center {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Top bar: controls, title, view switch */
+.wc-topbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    align-content: space-between center;
+    padding: 8px;
+}
+
+.left-controls {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    align-items: center;
+    width: 100%;
+}
+
+.title {
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.view-switch{
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+/* Buttons (mat styles will apply if material is present) */
+button {
+    cursor: pointer;
+}
+
+/* ---------- MONTH VIEW ---------- */
+.month-view {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: 14px;
+    box-shadow: var(--shadow-1);
+    overflow: hidden;
+}
+
+/* weekday header */
+.days-row {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    color: var(--muted);
+    font-weight: 700;
+    padding-bottom: 12px;
+}
+
+/* weeks grid */
+.weeks {
+    display: grid;
+    gap: 10px;
+}
+
+.week {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+}
+
+/* day cell: fluid height and padding */
+.day-cell {
+    background: linear-gradient(180deg, #fbfdff, #fff);
+    border-radius: var(--radius-md);
+    min-height: clamp(90px, 24vw, 140px);
+    padding: clamp(8px, 0.8vw, 12px);
+    transition: transform .18s ease, box-shadow .18s ease;
+    border: 1px solid rgba(15, 23, 42, 0.03);
+    position: relative;
+    overflow: hidden;
+}
+
+.day-cell:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(10, 20, 40, 0.06);
+}
+
+.day-cell.out-month {
+    opacity: 0.45;
+    background: transparent;
+    border: none;
+}
+
+.day-cell.today {
+    border: 2px solid var(--accent);
+    background: #eff6ff;
+}
+
+.day-cell.selected {
+    background: linear-gradient(180deg, #e5f0ff, #d9eaff);
+    border: 2px solid #60a5fa;
+}
+
+/* date number and event pills */
+.date-number {
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 8px;
+    font-size: clamp(.9rem, 1.3vw, 1rem);
+}
+
+.events {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.event-pill {
+    padding: 6px 10px;
+    border-radius: 999px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    box-shadow: 0 6px 16px rgba(10, 20, 40, 0.06);
+    transition: transform .12s;
+    display: block;
+    max-width: 100%; 
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.event-pill:hover {
+    transform: translateY(-4px);
+}
+
+/* ---------- WEEK VIEW (time-grid) ---------- */
+.week-view {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: 12px;
+    box-shadow: var(--shadow-1);
+    overflow: hidden;
+}
+
+/* grid: hours column + days */
+.wc-grid {
+    display: flex;
+    gap: 12px;
+    height: clamp(420px, 55vh, 760px);
+    overflow: hidden;
+}
+
+/* hours column */
+.wc-hours {
+    width: 72px;
+    padding-right: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.hour {
+    height: clamp(36px, 4vh, 44px);
+    display: flex;
+    align-items: flex-start;
+    padding-top: 6px;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+/* days columns (scrollable horizontally on narrow screens) */
+.wc-days {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    overflow: auto;
+    min-width: 0;
+    /* allow horizontal shrink */
+}
+
+.wc-day {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #fff, #fbfdff);
+    min-height: 100%;
+}
+
+/* day header and body */
+.day-header {
+    height: 44px;
+    padding: 8px 12px;
+    font-weight: 700;
+    color: #374151;
+    border-radius: 8px;
+}
+
+.day-header.today {
+    background: #eef6ff;
+    border-radius: 10px;
+}
+
+.day-body {
+    position: relative;
+    padding: 6px;
+    height: calc(100% - 44px);
+}
+
+/* grid rows and events layer */
+.grid-row {
+    height: clamp(36px, 4vh, 44px);
+    border-top: 1px dashed rgba(100, 110, 140, 0.06);
+}
+
+.events-layer {
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    top: 44px;
+    bottom: 6px;
+}
+
+/* event-block (absolute positioned inside events-layer) */
+.event-block {
+    position: absolute;
+    left: 6px;
+    right: 6px;
+    border-radius: 10px;
+    padding: 8px;
+    color: #062a3a;
+    font-weight: 700;
+    box-shadow: 0 8px 26px rgba(10, 20, 40, 0.08);
+    cursor: pointer;
+    overflow: hidden;
+    font-size: 0.9rem;
+}
+
+.ev-title {
+    font-size: 0.95rem;
+}
+
+.ev-meta {
+    font-size: 0.85rem;
+    color: rgba(7, 35, 58, 0.65);
+    font-weight: 500;
+}
+
+/* ---------- RIGHT PREVIEW ---------- */
+.wc-preview {
+    background: #F7F8FA;
+    border-radius: var(--radius-lg);
+    padding: 12px;
+    box-shadow: var(--shadow-1);
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 15%;
+    gap: 12px;
+}
+
+.preview-head {
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.preview-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.pv-item {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.pv-color {
+    width: 10px;
+    height: 40px;
+    border-radius: 6px;
+}
+
+.pv-title {
+    font-weight: 700;
+    display: block;
+    max-width: 100%; 
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* ---------- Responsive breakpoints ---------- */
+/* Large tablet -> collapse preview to bottom or hide */
+@media (max-width: 1200px) {
+    .wc-preview {
+        max-width: 17%;
+    }
+    .wc-sidebar{
+        max-width: 20%;
+    }
+}
+
+/* Tablet -> sidebar collapses and center becomes full width */
+@media (max-width: 900px) {
+    .calendar-wrapper {
+        grid-template-columns: 1fr;
+        padding: 10px;
+    }
+
+    .wc-sidebar {
+        order: 2;
+        width: 100%;
+    }
+
+    .wc-center {
+        order: 1;
+    }
+
+    .wc-preview {
+        order: 3;
+        display: none;
+    }
+
+    .mm-grid {
+        display: block;
+    }
+
+    /* mini month still visible in sidebar */
+    .wc-grid {
+        height: 520px;
+        overflow: auto;
+    }
+
+    .week-view .wc-days {
+        grid-template-columns: repeat(7, minmax(150px, 1fr));
+        overflow-x: auto;
+    }
+
+    .day-body {
+        padding: 4px;
+    }
+}
+
+/* Mobile narrow screens: stack, hide sidebar, optimize touch targets */
+@media (max-width: 600px) {
+    .calendar-wrapper {
+        grid-template-columns: 1fr;
+        padding: 6px;
+    }
+
+    .wc-sidebar {
+        display: none;
+    }
+
+    /* hide left panel on phone */
+    .title h2 {
+        font-size: 1.1rem;
+    }
+
+    .days-row {
+        display: none;
+    }
+
+    /* conserve vertical space */
+    .week {
+        grid-auto-rows: minmax(70px, auto);
+    }
+
+    .day-cell {
+        min-height: 86px;
+        padding: 8px;
+    }
+
+    .event-pill {
+        font-size: 0.85rem;
+        padding: 6px 8px;
+    }
+
+    .wc-grid {
+        height: 640px;
+    }
+
+    .wc-hours {
+        display: none;
+    }
+
+    /* hide hours on very small screens */
+    .wc-days {
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(160px, 1fr);
+        overflow-x: auto;
+    }
+
+    .day-header {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+
+    .event-block {
+        padding: 6px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Accessibility / high-contrast adjustments */
+@media (prefers-contrast: more) {
+    .day-cell {
+        border: 1px solid rgba(0, 0, 0, 0.12);
+    }
+
+    .event-pill {
+        box-shadow: none;
+    }
+}

@@ -1,1 +1,39 @@
 /* You can add global styles to this file, and also import other style files */
+/* styles.css */
+@import "@angular/material/prebuilt-themes/indigo-pink.css";
+
+/* optional but recommended fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Icons');
+
+/* base body tweaks */
+body {
+    font-family: Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: #F7F8FA;
+    margin: 0;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+/* Make font sizes fluid */
+html {
+    font-size: 14px;
+}
+
+h2 {
+    font-size: clamp(1.35rem, 1.8vw + 0.2rem, 2rem);
+    margin: 0;
+}
+
+h4 {
+    font-size: clamp(1rem, 1.4vw, 1.125rem);
+    margin: 0;
+}

@@ -1,0 +1,80 @@
+<h2 mat-dialog-title>{{ editing ? 'Edit Event' : 'Create Event' }}</h2>
+
+<div mat-dialog-content>
+  <form [formGroup]="form" (ngSubmit)="save()" novalidate>
+
+    <mat-form-field appearance="fill" style="width:100%">
+      <mat-label>Title</mat-label>
+      <input matInput formControlName="title" />
+      <mat-error *ngIf="form.get('title')?.touched && form.get('title')?.hasError('required')">
+        Title is required
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" style="width:100%">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description" rows="3"></textarea>
+    </mat-form-field>
+
+    <div class="row" style="display:flex;gap:12px;">
+      <mat-form-field appearance="fill" style="flex:1">
+        <mat-label>Category</mat-label>
+        <mat-select formControlName="category">
+          <mat-option *ngFor="let c of categories" [value]="c.label">{{ c.label }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" style="width:140px">
+        <mat-label>Color</mat-label>
+        <input matInput formControlName="color" />
+      </mat-form-field>
+    </div>
+
+    <div class="row" style="display:flex;gap:12px;">
+      <mat-form-field appearance="fill" style="flex:1">
+        <mat-label>Start</mat-label>
+        <input matInput type="time" formControlName="startTime" />
+      </mat-form-field>
+
+      <mat-form-field appearance="fill" style="flex:1">
+        <mat-label>End</mat-label>
+        <input matInput type="time" formControlName="endTime" />
+      </mat-form-field>
+    </div>
+
+    <div class="color-preset" style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+      <!-- Changed aria binding to use [attr.aria-label] to avoid parser errors -->
+      <button type="button"
+              *ngFor="let c of categories"
+              (click)="pickColor(c.color)"
+              class="swatch"
+              [style.background]="c.color"
+              [attr.aria-label]="'Pick color ' + c.label"
+              aria-pressed="false"
+              style="width:32px;height:32px;border-radius:6px;border:none;cursor:pointer">
+      </button>
+    </div>
+
+    <!-- inline past-date error -->
+    <div *ngIf="pastDateError || isPastEvent()" role="alert" style="color:#b91c1c; margin-top:12px; font-weight:600;">
+      {{ pastDateMessage || 'Cannot create events in the past.' }}
+    </div>
+
+  </form>
+</div>
+
+<div mat-dialog-actions style="display:flex;justify-content:space-between;align-items:center;">
+  <div>
+    <button mat-button type="button" (click)="dialogRef.close()">Cancel</button>
+    <button mat-button color="warn" *ngIf="editing" type="button" (click)="delete()">Delete</button>
+  </div>
+
+  <div>
+    <button mat-flat-button color="primary"
+            type="button"
+            (click)="save()"
+            [disabled]="form.invalid || isPastEvent()">
+      {{ editing ? 'Save' : 'Create' }}
+    </button>
+  </div>
+</div>
